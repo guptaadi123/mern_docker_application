@@ -1,0 +1,38 @@
+version: '3'
+
+services:
+  app:
+    image: ${APP_IMAGE_NAME}
+    user: ${USER}
+    volumes:
+       - ${APP_HOST_VOLUME}:${APP_DEST_VOLUME}
+    command: >
+         sh -c  "cd ${APP_DEST_VOLUME} &&
+                   cd ${PROJECT_FOLDER_NAME} &&
+                   node -v &&
+                   npm -v &&
+                   npm i &&
+                   cd views &&
+                   npm i &&
+                    cd .. &&
+                    npm run dev"
+    ports:
+         - ${HOST_PORT}:${APP_PORT}
+    depends_on:
+          - mongo
+    networks:
+         - mern-app
+  mongo:
+     image: ${DATABASE_IMAGE_NAME}
+     ports:
+         - ${HOST_PORT_DB}:${DB_PORT}
+     networks:
+          - mern-app
+     volumes:
+        - mongo-data:/data/db
+networks:
+     mern-app:
+         driver: bridge
+volumes:
+   mongo-data:
+    driver: local
